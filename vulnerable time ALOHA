@@ -1,0 +1,63 @@
+import random
+import matplotlib.pyplot as plt
+
+# Constants
+num_stations = 4           # Number of stations
+simulation_time = 100      # Total simulation time units
+slot_time = 1              # Duration of each time slot
+max_transmissions = 5       # Max transmissions per station
+
+# Generate random transmission times for each station, aligned to time slots
+transmissions = {}
+for station in range(1, num_stations + 1):
+    transmission_times = []
+    while len(transmission_times) < max_transmissions:  # Limit the number of transmissions per station
+        # Randomly choose a time slot for transmission
+        time_slot = random.randint(0, (simulation_time // slot_time) - 1)
+        time = time_slot * slot_time  # Align to slot boundaries
+        transmission_times.append(time)
+    transmissions[station] = transmission_times  # Save the transmission times for each station
+
+# Collision detection and retransmission handling
+collisions = []
+successful_transmissions = []
+transmission_attempts = {station: [] for station in range(1, num_stations + 1)}
+
+# Check collisions for each slot
+for time in range(0, simulation_time, slot_time):
+    # Check which stations are trying to send at this time slot
+    active_stations = [station for station, times in transmissions.items() if time in times]
+
+    if len(active_stations) > 1:  # Collision detected
+        collisions.append(time)
+        # Log the collision for all colliding stations
+        for station in active_stations:
+            transmission_attempts[station].append(time)
+    elif len(active_stations) == 1:  # Successful transmission
+        successful_transmissions.append((active_stations[0], time))
+        transmission_attempts[active_stations[0]].append(time)
+
+# Visualization
+plt.figure(figsize=(12, 6))
+
+# Plot each station's transmission times
+for station, times in transmissions.items():
+    plt.scatter(times, [station] * len(times), label=f'Station {station}', s=50)
+
+# Highlight collision times with a shaded region to indicate vulnerable time
+for time in collisions:
+    plt.axvline(x=time, color='red', linestyle='--', label='Collision' if time == collisions[0] else "")
+    plt.fill_betweenx([-0.5, num_stations + 0.5], time, time + slot_time, color='red', alpha=0.1)
+
+# Adding labels and title
+plt.title('Vulnerable Time in Slotted ALOHA Network Simulation')
+plt.xlabel('Time (in slots)')
+plt.yticks(range(1, num_stations + 1))
+plt.ylabel('Stations')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Output the transmission attempts
+for station, attempts in transmission_attempts.items():
+    print(f'Station {station} transmission attempts at times: {attempts}')
