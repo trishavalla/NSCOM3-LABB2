@@ -1,0 +1,47 @@
+import random
+import time
+
+def csma_ca_frame_exchange(device_id):
+    print(f"Device {device_id} is sensing the channel...")
+    
+    # Step 1: Sense the channel
+    while True:
+        channel_state = random.choice(['busy', 'idle'])
+        print(f"Device {device_id} found the channel {channel_state}.")
+
+        if channel_state == 'idle':
+            # DIFS wait
+            print(f"Device {device_id} is waiting for DIFS...")
+            time.sleep(1)  # Simulating DIFS
+
+            # Send RTS
+            print(f"Device {device_id} is sending RTS...")
+            time.sleep(0.5)  # Simulate RTS transmission
+            
+            # Step 2: Receive RTS and send CTS
+            print(f"Device {device_id} is waiting for SIFS...")
+            time.sleep(0.3)  # Simulate SIFS
+            
+            print(f"Device {device_id} is sending CTS...")
+            time.sleep(0.5)  # Simulate CTS transmission
+            
+            # Step 3: Source sends data after SIFS
+            print(f"Device {device_id} is waiting for SIFS before sending data...")
+            time.sleep(0.3)  # Simulate SIFS
+            
+            print(f"Device {device_id} is sending data...")
+            time.sleep(1)  # Simulate data transmission
+            
+            # Step 4: Destination sends ACK after SIFS
+            print(f"Device {device_id} is waiting for SIFS to send ACK...")
+            time.sleep(0.3)  # Simulate SIFS
+            
+            print(f"Device {device_id} is sending ACK...")
+            break  # Exit after acknowledgment
+
+        else:
+            print(f"Device {device_id} found the channel busy. Retrying...")
+
+# Simulate the frame exchange for two devices
+csma_ca_frame_exchange(1)
+csma_ca_frame_exchange(2)

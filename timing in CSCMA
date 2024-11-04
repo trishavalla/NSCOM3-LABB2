@@ -1,0 +1,39 @@
+import random
+import time
+
+def csma_ca(device_id):
+    # Continuously sense the channel
+    print(f"Device {device_id} is sensing the channel...")
+    while True:
+        # Simulate channel state (0 = idle, 1 = busy)
+        channel_state = random.choice([0, 1])
+
+        if channel_state == 0:  # Channel found idle
+            print(f"Device {device_id} found the channel idle.")
+            # Wait for Inter-Frame Space (IFS)
+            print(f"Device {device_id} is waiting for IFS...")
+            time.sleep(1)  # Simulating IFS time
+
+            # Determine contention window size
+            contention_window = 2 ** random.randint(0, 2)  # Example size: binary exponential
+            print(f"Device {device_id} has a contention window size of {contention_window}.")
+
+            # Simulate waiting for contention window
+            time.sleep(random.uniform(0.1, 0.5) * contention_window)  # Simulating backoff
+
+            # Send frame
+            print(f"Device {device_id} is sending a frame...")
+            time.sleep(0.5)  # Simulate time taken to send the frame
+
+            # Simulate a timeout scenario (randomly)
+            if random.choice([True, False]):  # Randomly determine if the send was successful
+                print(f"Device {device_id} sent the frame successfully!")
+                break  # Exit loop on successful send
+            else:
+                print(f"Device {device_id} experienced a timeout. Restarting...")
+        else:
+            print(f"Device {device_id} found the channel busy. Retrying...")
+
+# Simulate two devices
+csma_ca(1)
+csma_ca(2)

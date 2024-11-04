@@ -1,0 +1,26 @@
+import time
+import random
+
+class Station:
+    def __init__(self, id):
+        self.id = id
+
+    def transmit_data(self, time_slot):
+        print(f"[Time Slot {time_slot}] Station {self.id} is transmitting data...")
+        transmission_time = random.uniform(1, 2)
+        time.sleep(transmission_time)
+        print(f"[Time Slot {time_slot}] Station {self.id} finished transmitting.")
+
+class TDMA:
+    def __init__(self):
+        self.stations = [Station(i) for i in range(1, 4)]
+
+    def start_transmission(self):
+        print("Starting TDMA Transmission:\n")
+        for time_slot in range(1, 4):
+            print(f"--- Time Slot {time_slot} ---")
+            self.stations[time_slot - 1].transmit_data(time_slot)
+            print(f"--- End of Time Slot {time_slot} ---\n")
+
+tdma_system = TDMA()
+tdma_system.start_transmission()

@@ -1,0 +1,47 @@
+import random
+import time
+
+class Node:
+    def __init__(self, id):
+        self.id = id
+        self.is_sending = False
+    def send_rts(self, ap):
+        print(f"Node {self.id} is sending RTS to AP.")
+        ap.receive_rts(self)
+class AP:
+    def __init__(self):
+        self.ready_to_send = True
+        self.current_sending_node = None
+
+    def receive_rts(self, node):
+        if self.ready_to_send:
+            print(f"AP received RTS from Node {node.id}. Sending CTS...")
+            self.send_cts(node)
+        else:
+            print(f"AP is busy. Node {node.id} must wait.")
+    def send_cts(self, node):
+        print(f"AP sent CTS to Node {node.id}. Node {node.id} can send data.")
+        self.current_sending_node = node
+        self.ready_to_send = False  # Mark AP as busy
+    def complete_transaction(self):
+        if self.current_sending_node:
+            print(f"Node {self.current_sending_node.id} is sending data...")
+            time.sleep(random.uniform(0.5, 1.5))  # Simulate time to send data
+            print(f"Node {self.current_sending_node.id} finished sending data.")
+            self.current_sending_node = None  # Reset for the next transaction
+            self.ready_to_send = True  # AP is now ready for the next transmission
+def simulate(hidden_node_problem):
+    ap = AP()
+    nodes = [Node(i) for i in range(1, 4)]  # Simulate three nodes
+
+    # Randomly decide if a node wants to send data
+    for node in nodes:
+        if random.choice([True, False]):
+            node.send_rts(ap)  # Send RTS to AP
+            # Simulate the sending process; only allow one node to send at a time
+            if not ap.ready_to_send:
+                # This would indicate that another node might have sent RTS simultaneously
+                print(f"Collision occurred! Nodes are unaware of each other.")
+            else:
+                ap.complete_transaction()  # Process the sending of data
+simulate(hidden_node_problem=True)

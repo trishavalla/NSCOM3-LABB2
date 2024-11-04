@@ -1,0 +1,39 @@
+import random
+import time
+
+class Channel:
+    def __init__(self, frequency):
+        self.frequency = frequency
+        self.is_busy = False
+
+    def transmit_signal(self, signal):
+        print(f"Transmitting '{signal}' on frequency {self.frequency} GHz...")
+        time.sleep(random.uniform(1, 2))
+        print(f"Transmission of '{signal}' on frequency {self.frequency} GHz completed.")
+
+class FDM:
+    def __init__(self):
+        self.channels = [Channel(i) for i in range(1, 4)]
+
+    def transmit_data(self):
+        print("FDM allows simultaneous transmission on all channels:")
+        for channel in self.channels:
+            channel.transmit_signal(f"Signal from FDM on channel {channel.frequency}")
+
+class FDMA:
+    def __init__(self):
+        self.channels = [Channel(i) for i in range(1, 4)]
+        self.stations = ['Station 1', 'Station 2', 'Station 3']
+
+    def allocate_and_transmit(self):
+        print("FDMA allocates one channel at a time for each station:")
+        for station, channel in zip(self.stations, self.channels):
+            if not channel.is_busy:
+                channel.transmit_signal(f"Signal from {station} on channel {channel.frequency}")
+
+fdm_system = FDM()
+fdma_system = FDMA()
+print("Starting FDM Transmission:")
+fdm_system.transmit_data()
+print("\nStarting FDMA Transmission:")
+fdma_system.allocate_and_transmit()

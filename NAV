@@ -1,0 +1,43 @@
+import random
+import time
+
+class Station:
+    def __init__(self, device_id):
+        self.device_id = device_id
+        self.nav = 0  # Network Allocation Vector timer
+
+    def send_rts(self, rts_duration):
+        print(f"Device {self.device_id} is sending RTS for {rts_duration} seconds.")
+        self.nav = rts_duration  # Set NAV based on RTS duration
+
+    def check_nav(self):
+        if self.nav > 0:
+            print(f"Device {self.device_id} NAV is active for {self.nav} seconds.")
+            return True
+        return False
+
+    def decrement_nav(self, time_passed):
+        self.nav = max(0, self.nav - time_passed)  # Decrement NAV
+
+def csma_ca_with_nav(device_id, rts_duration):
+    station = Station(device_id)
+
+    while True:
+        # Simulate NAV countdown
+        if station.check_nav():
+            print(f"Device {device_id} is waiting due to NAV.")
+            time.sleep(1)  # Wait while NAV is active
+            station.decrement_nav(1)  # Decrement NAV timer by 1 second
+            continue
+
+        # Simulate channel sensing
+        channel_state = random.choice(['busy', 'idle'])
+        print(f"Device {device_id} found the channel {channel_state}.")
+
+        if channel_state == 'idle':
+            station.send_rts(rts_duration)  # Send RTS and set NAV
+            break  # Exit loop after sending RTS
+
+# Simulate the NAV mechanism for two devices with different RTS durations
+csma_ca_with_nav(1, 5)  # Device 1 sends RTS for 5 seconds
+csma_ca_with_nav(2, 3)  # Device 2 sends RTS for 3 seconds

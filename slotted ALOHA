@@ -1,0 +1,70 @@
+import random
+import matplotlib.pyplot as plt
+
+# Constants
+num_stations = 4            # Number of stations
+simulation_time = 200       # Total simulation time units
+slot_time = 5               # Duration of each time slot
+
+# Generate random transmission times for each station
+transmissions = {}
+for station in range(1, num_stations + 1):
+    transmission_times = []
+    time = 0
+    # Each station tries to send frames at random slots
+    while time < simulation_time:
+        # Select random slots (1-10) to increase variation
+        time += random.randint(1, 10) * slot_time  
+        if time < simulation_time:  # Ensure time does not exceed simulation_time
+            transmission_times.append(time)
+    transmissions[station] = transmission_times  # Save the transmission times for each station
+
+# Collision detection and retransmission handling
+collisions = []
+successful_transmissions = []
+transmission_attempts = {station: [] for station in range(1, num_stations + 1)}
+
+# Track occupied slots
+occupied_slots = set()
+
+for time in range(0, simulation_time, slot_time):
+    # Check which stations are trying to send at this time
+    active_stations = [station for station, times in transmissions.items() if time in times]
+    
+    if len(active_stations) > 1:  # Collision detected
+        collisions.append(time)
+        # Log the collision for all colliding stations
+        for station in active_stations:
+            transmission_attempts[station].append(time)
+            # Simulate backoff
+            backoff_slots = random.randint(1, 8)  # Random backoff between 1 and 8 slots
+            new_time = time + backoff_slots * slot_time
+            if new_time < simulation_time:
+                transmissions[station].append(new_time)  # Schedule a new transmission attempt
+    elif len(active_stations) == 1:  # Successful transmission
+        successful_transmissions.append((active_stations[0], time))
+        transmission_attempts[active_stations[0]].append(time)
+
+# Visualization
+plt.figure(figsize=(12, 6))
+
+# Plot each station's transmission times
+for station, times in transmissions.items():
+    plt.scatter(times, [station] * len(times), label=f'Station {station}', s=50)
+
+# Highlight collision times
+for time in collisions:
+    plt.axvline(x=time, color='red', linestyle='--', label='Collision' if time == collisions[0] else "")
+
+# Adding labels and title
+plt.title('Slotted ALOHA Network Simulation')
+plt.xlabel('Time')
+plt.yticks(range(1, num_stations + 1))
+plt.ylabel('Stations')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Output the transmission attempts
+for station, attempts in transmission_attempts.items():
+    print(f'Station {station} transmission attempts at times: {attempts}')
