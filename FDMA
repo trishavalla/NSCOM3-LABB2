@@ -1,0 +1,43 @@
+import random
+import time
+
+class Station:
+    def __init__(self, id, frequency_band):
+        self.id = id
+        self.frequency_band = frequency_band
+
+    def transmit_data(self):
+        print(f"Station {self.id} is transmitting data on frequency band {self.frequency_band}...")
+        transmission_time = random.uniform(1, 3)
+        time.sleep(transmission_time)
+        print(f"Station {self.id} finished transmitting data.")
+
+class FDMA:
+    def __init__(self):
+        self.stations = []
+        self.guard_band = 0.1
+        
+    def add_station(self, station):
+        self.stations.append(station)
+
+    def allocate_frequency_bands(self):
+        frequency_start = 0
+        frequency_step = 1
+
+        for station in self.stations:
+            station.frequency_band = frequency_start + self.guard_band
+            frequency_start += frequency_step + self.guard_band
+            print(f"Allocated frequency band {station.frequency_band:.1f} GHz to Station {station.id}.")
+
+    def start_transmission(self):
+        print("Starting FDMA transmission...")
+        for station in self.stations:
+            station.transmit_data()
+
+fdma_system = FDMA()
+fdma_system.add_station(Station(1, None))
+fdma_system.add_station(Station(2, None))
+fdma_system.add_station(Station(3, None))
+
+fdma_system.allocate_frequency_bands()
+fdma_system.start_transmission()
