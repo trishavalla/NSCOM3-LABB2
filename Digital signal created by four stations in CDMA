@@ -1,0 +1,79 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Function to spread the signal using the spreading code
+def spread_signal(data, code):
+    return np.array(data) * np.array(code)
+
+# Function to despread the received signal using the spreading code
+def despread_signal(received_signal, code):
+    return np.sum(received_signal * code) / len(code)
+
+# Define data for each station (1 for binary 1 and 0 for binary 0)
+data_stations = {
+    'Station M': 1,   # Transmitting binary 1
+    'Station N': 0,   # Transmitting binary 0
+    'Station O': 1,   # Transmitting binary 1
+    'Station P': 1    # Transmitting binary 1
+}
+
+# Define orthogonal codes for each station (Example codes)
+codes = {
+    'Station M': [1, 1, 1, 1],
+    'Station N': [1, -1, -1, 1],
+    'Station O': [-1, 1, -1, 1],
+    'Station P': [-1, -1, 1, 1]
+}
+
+# Spread the signals for each station
+spread_signals = {}
+for station, data in data_stations.items():
+    spread_signals[station] = spread_signal([data], codes[station])
+
+# Combine the spread signals to simulate transmission over the channel
+combined_signal = np.sum(list(spread_signals.values()), axis=0)
+
+# Print the spread signals and the combined signal
+print("Spread Signals:")
+for station, signal in spread_signals.items():
+    print(f"{station}: {signal}")
+
+print(f"\nCombined Signal: {combined_signal}")
+
+# Now we will despread the combined signal for each station
+received_data = {}
+for station in codes.keys():
+    received_data[station] = despread_signal(combined_signal, codes[station])
+
+# Print the received data after despreading
+print("\nReceived Data:")
+for station, received in received_data.items():
+    # Convert received value back to binary (1 or 0)
+    received_data[station] = 1 if received > 0 else 0
+    print(f"{station}: {received_data[station]}")
+
+# Plotting the signals for visualization
+plt.figure(figsize=(10, 6))
+time = np.arange(len(combined_signal))
+
+# Plot the combined signal
+plt.subplot(2, 1, 1)
+plt.plot(time, combined_signal, label='Combined Signal', marker='o')
+plt.title('Combined CDMA Signal')
+plt.xlabel('Time')
+plt.ylabel('Amplitude')
+plt.grid()
+plt.legend()
+
+# Plot the spread signals
+plt.subplot(2, 1, 2)
+for station, signal in spread_signals.items():
+    plt.plot(time, signal, label=station, marker='o')
+plt.title('Spread Signals')
+plt.xlabel('Time')
+plt.ylabel('Amplitude')
+plt.grid()
+plt.legend()
+
+plt.tight_layout()
+plt.show()
